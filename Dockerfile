@@ -5,7 +5,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Install dependencies first for better caching
-COPY package.json package-lock.json ./
+COPY package.json ./
 RUN npm ci --only=production
 
 # Copy application files
