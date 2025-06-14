@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: voltageid-vcf-generator
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_PASSWORD
+        value: voltageid123
+      - key: NODE_ENV
+        value: production
