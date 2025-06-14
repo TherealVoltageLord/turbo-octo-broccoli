@@ -1,0 +1,573 @@
+<!-- public/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOLTAGEID | Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #0a192f;
+            --primary-light: #172a45;
+            --accent-blue: #64ffda;
+            --text-primary: #e6f1ff;
+            --text-secondary: #8892b0;
+            --glass-effect: rgba(10, 25, 47, 0.85);
+            --glass-border: rgba(100, 255, 218, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --primary-dark: #f0f4ff;
+            --primary-light: #d6e4ff;
+            --accent-blue: #4a80f0;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a6a;
+            --glass-effect: rgba(240, 244, 255, 0.85);
+            --glass-border: rgba(74, 128, 240, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle {
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .glass-card {
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .status-inactive {
+            background-color: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            background: rgba(10, 25, 47, 0.5);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+        }
+
+        button {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-danger {
+            background: #ff5555;
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+        }
+
+        .session-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .session-controls button {
+            flex: 1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--accent-blue);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            max-width: 300px;
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            border-left-color: #ff5555;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            color: var(--accent-blue);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .session-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <span>VOLTAGEID</span>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </header>
+        
+        <div class="dashboard-grid">
+            <div class="glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Session Status
+                </h2>
+                
+                <div id="sessionStatus">
+                    <p>
+                        <span class="status-indicator status-inactive" id="statusIndicator"></span>
+                        <span id="statusText">Inactive</span>
+                    </p>
+                    
+                    <p class="stat-value" id="contactCount">0</p>
+                    <p class="stat-label">Contacts Collected</p>
+                    
+                    <p class="stat-value" id="remainingTime">00:00</p>
+                    <p class="stat-label">Time Remaining</p>
+                </div>
+            </div>
+            
+            <div class="glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-cog"></i>
+                    Session Controls
+                </h2>
+                
+                <form id="sessionForm">
+                    <div class="form-group">
+                        <label for="duration">Session Duration (minutes)</label>
+                        <input type="number" id="duration" min="1" max="120" value="10" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxContacts">Max Contacts (optional)</label>
+                        <input type="number" id="maxContacts" min="1">
+                    </div>
+                    
+                    <div class="session-controls">
+                        <button type="button" id="startBtn">Start Session</button>
+                        <button type="button" id="stopBtn" class="btn-danger" disabled>Stop Session</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-download"></i>
+                    Export Data
+                </h2>
+                
+                <div class="form-group">
+                    <button type="button" id="downloadVcfBtn" class="btn-secondary" disabled>
+                        <i class="fas fa-file-alt"></i> Download VCF
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <button type="button" id="downloadJsonBtn" class="btn-secondary">
+                        <i class="fas fa-file-code"></i> Export JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        let currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        if (currentTheme === 'light') {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            if (currentTheme === 'dark') {
+                currentTheme = 'light';
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                currentTheme = 'dark';
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+        });
+        
+        // Particles.js
+        particlesJS.load('particles-js', 'assets/particles.json', function() {
+            console.log('Particles.js loaded');
+        });
+        
+        // Session Management
+        let sessionInterval;
+        let countdownInterval;
+        
+        async function checkSessionStatus() {
+            try {
+                const response = await fetch('/api/session-status', {
+                    credentials: 'include'
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                const statusIndicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                const contactCount = document.getElementById('contactCount');
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const downloadVcfBtn = document.getElementById('downloadVcfBtn');
+                
+                if (data.active) {
+                    statusIndicator.className = 'status-indicator status-active';
+                    statusText.textContent = 'Active';
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    downloadVcfBtn.disabled = true;
+                    
+                    // Update countdown
+                    clearInterval(countdownInterval);
+                    updateCountdown(data.remainingTime);
+                    countdownInterval = setInterval(() => {
+                        data.remainingTime -= 1000;
+                        updateCountdown(data.remainingTime);
+                    }, 1000);
+                } else {
+                    statusIndicator.className = 'status-indicator status-inactive';
+                    statusText.textContent = 'Inactive';
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    downloadVcfBtn.disabled = !data.vcfAvailable;
+                    
+                    document.getElementById('remainingTime').textContent = '00:00';
+                    clearInterval(countdownInterval);
+                }
+                
+                contactCount.textContent = data.contactCount;
+            } catch (error) {
+                console.error('Error checking session status:', error);
+                showToast('Error connecting to server', 'error');
+            }
+        }
+        
+        function updateCountdown(ms) {
+            const seconds = Math.floor((ms / 1000) % 60);
+            const minutes = Math.floor((ms / (1000 * 60)) % 60);
+            const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+            
+            let timeString = '';
+            if (hours > 0) timeString += ${hours.toString().padStart(2, '0')}:;
+            timeString += ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
+            
+            document.getElementById('remainingTime').textContent = timeString;
+        }
+        
+        // Start Session
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            const duration = parseInt(document.getElementById('duration').value) * 60 * 1000;
+            const maxContacts = document.getElementById('maxContacts').value ? parseInt(document.getElementById('maxContacts').value) : null;
+            
+            try {
+                const response = await fetch('/api/start-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ duration, maxContacts })
+                });
+                
+                if (response.ok) {
+                    showToast('Session started successfully!');
+                    checkSessionStatus();
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Error starting session', 'error');
+                }
+            } catch (error) {
+                console.error('Error starting session:', error);
+                showToast('Error starting session', 'error');
+            }
+        });
+        
+        // Stop Session
+        document.getElementById('stopBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/stop-session', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    showToast('Session stopped successfully!');
+                    checkSessionStatus();
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Error stopping session', 'error');
+                }
+            } catch (error) {
+                console.error('Error stopping session:', error);
+                showToast('Error stopping session', 'error');
+            }
+        });
+        
+        // Download VCF
+        document.getElementById('downloadVcfBtn').addEventListener('click', () => {
+            window.location.href = '/api/download-vcf';
+        });
+        
+        // Download JSON
+        document.getElementById('downloadJsonBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/export-json', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'voltageid-contacts.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Error exporting data', 'error');
+                }
+            } catch (error) {
+                console.error('Error exporting JSON:', error);
+                showToast('Error exporting data', 'error');
+            }
+        });
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/admin-logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                showToast('Error during logout', 'error');
+            }
+        });
+        
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = type === 'error' ? 'toast error show' : 'toast show';
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize
+        checkSessionStatus();
+        sessionInterval = setInterval(checkSessionStatus, 3000);
+    </script>
+</body>
+</html>

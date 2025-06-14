@@ -1,0 +1,454 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOLTAGEID | Contact Collector</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #0a192f;
+            --primary-light: #172a45;
+            --accent-blue: #64ffda;
+            --text-primary: #e6f1ff;
+            --text-secondary: #8892b0;
+            --glass-effect: rgba(10, 25, 47, 0.85);
+            --glass-border: rgba(100, 255, 218, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --primary-dark: #f0f4ff;
+            --primary-light: #d6e4ff;
+            --accent-blue: #4a80f0;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a6a;
+            --glass-effect: rgba(240, 244, 255, 0.85);
+            --glass-border: rgba(74, 128, 240, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .status-inactive {
+            background-color: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            background: rgba(10, 25, 47, 0.5);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+        }
+
+        button {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .contact-counter {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            z-index: 100;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--accent-blue);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            max-width: 300px;
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            border-left-color: #ff5555;
+        }
+
+        .admin-link {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .admin-link:hover {
+            color: var(--accent-blue);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .glass-card {
+                padding: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="container">
+        <div class="glass-card">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <span>VOLTAGEID</span>
+            </div>
+            
+            <h1 id="statusText">
+                <span class="status-indicator status-inactive" id="statusIndicator"></span>
+                Session Inactive
+            </h1>
+            
+            <div id="inactiveState">
+                <p>No active collection session. Please check back later.</p>
+                <button id="downloadBtn" style="display: none;">Download Contacts</button>
+            </div>
+            
+            <div id="activeState" style="display: none;">
+                <p class="contact-counter">Contacts collected: <span id="contactCount">0</span></p>
+                <p class="timer">Time remaining: <span id="countdown">00:00</span></p>
+                
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="whatsapp">WhatsApp Number</label>
+                        <input type="tel" id="whatsapp" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email (Optional)</label>
+                        <input type="email" id="email">
+                    </div>
+                    
+                    <button type="submit">Submit Contact</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    <a href="/login" class="admin-link">Admin Login</a>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        let currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        if (currentTheme === 'light') {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            if (currentTheme === 'dark') {
+                currentTheme = 'light';
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                currentTheme = 'dark';
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+        });
+        
+        // Particles.js
+        particlesJS.load('particles-js', 'assets/particles.json', function() {
+            console.log('Particles.js loaded');
+        });
+        
+        // Session Management
+        let sessionInterval;
+        let countdownInterval;
+        
+        async function checkSessionStatus() {
+            try {
+                const response = await fetch('/api/session-status');
+                const data = await response.json();
+                
+                const statusIndicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                const activeState = document.getElementById('activeState');
+                const inactiveState = document.getElementById('inactiveState');
+                const downloadBtn = document.getElementById('downloadBtn');
+                
+                if (data.active) {
+                    statusIndicator.className = 'status-indicator status-active';
+                    statusText.textContent = 'Active Session';
+                    activeState.style.display = 'block';
+                    inactiveState.style.display = 'none';
+                    downloadBtn.style.display = 'none';
+                    
+                    document.getElementById('contactCount').textContent = data.contactCount;
+                    
+                    // Update countdown
+                    clearInterval(countdownInterval);
+                    updateCountdown(data.remainingTime);
+                    countdownInterval = setInterval(() => {
+                        data.remainingTime -= 1000;
+                        updateCountdown(data.remainingTime);
+                    }, 1000);
+                } else {
+                    statusIndicator.className = 'status-indicator status-inactive';
+                    statusText.textContent = 'Session Inactive';
+                    activeState.style.display = 'none';
+                    inactiveState.style.display = 'block';
+                    
+                    if (data.vcfAvailable) {
+                        downloadBtn.style.display = 'block';
+                    } else {
+                        downloadBtn.style.display = 'none';
+                    }
+                    
+                    clearInterval(countdownInterval);
+                }
+            } catch (error) {
+                console.error('Error checking session status:', error);
+                showToast('Error connecting to server', 'error');
+            }
+        }
+        
+        function updateCountdown(ms) {
+            const seconds = Math.floor((ms / 1000) % 60);
+            const minutes = Math.floor((ms / (1000 * 60)) % 60);
+            const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+            
+            let timeString = '';
+            if (hours > 0) timeString += ${hours.toString().padStart(2, '0')}:;
+            timeString += ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
+            
+            document.getElementById('countdown').textContent = timeString;
+        }
+        
+        // Form Submission
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            try {
+                const response = await fetch('/api/submit-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, whatsapp, email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast('Contact submitted successfully!');
+                    document.getElementById('contactForm').reset();
+                    checkSessionStatus(); // Refresh status to update count
+                } else {
+                    showToast(data.error || 'Error submitting contact', 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting contact:', error);
+                showToast('Error submitting contact', 'error');
+            }
+        });
+        
+        // Download Button
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            window.location.href = '/api/download-vcf';
+        });
+        
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = type === 'error' ? 'toast error show' : 'toast show';
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize
+        checkSessionStatus();
+        sessionInterval = setInterval(checkSessionStatus, 3000);
+    </script>
+</body>
+</html>
